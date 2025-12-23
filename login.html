@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <link rel="icon" href="web_logo.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Imperial United</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+            position: relative;
+            background: #000;
+        }
+        .back-vid {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            mix-blend-mode: overlay;
+        }
+        .auth-container {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* লোডার */
+        #initial-loader {
+            text-align: center;
+        }
+        .loader {
+            width: 0;
+            height: 4.8px;
+            display: inline-block;
+            position: relative;
+            background: #FFF;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            box-sizing: border-box;
+            animation: animFw 8s linear infinite;
+        }
+        .loader::after, .loader::before {
+            content: '';
+            width: 10px;
+            height: 1px;
+            background: #FFF;
+            position: absolute;
+            top: 9px;
+            right: -2px;
+            opacity: 0;
+            transform: rotate(-45deg) translateX(0px);
+            box-sizing: border-box;
+            animation: coli1 0.3s linear infinite;
+        }
+        .loader::before {
+            top: -4px;
+            transform: rotate(45deg);
+            animation: coli2 0.3s linear infinite;
+        }
+        @keyframes animFw {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        @keyframes coli1 {
+            0% { transform: rotate(-45deg) translateX(0px); opacity: 0.7; }
+            100% { transform: rotate(-45deg) translateX(-45px); opacity: 0; }
+        }
+        @keyframes coli2 {
+            0% { transform: rotate(45deg) translateX(0px); opacity: 1; }
+            100% { transform: rotate(45deg) translateX(-45px); opacity: 0.7; }
+        }
+
+        /* লোডার কন্টেইনার */
+        .loader-container {
+            width: 300px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .loader-text {
+            font-size: 18px;
+            color: #72a1de;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        /* লগইন বক্স */
+        .auth-box {
+            background: rgba(0, 0, 50, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 40px 50px;
+            border-radius: 20px;
+            border: 1px solid #72a1de81;
+            box-shadow: 0 0 20px #72a1de81;
+            width: 400px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-box h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .auth-box h1 span {
+            background: linear-gradient(to right,#00aaa7, #7e42a7, #6600c5, #6070fd,#2a46ff, #0099ff, #008ead);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: animate-gradient 2.5s linear infinite;
+        }
+        @keyframes animate-gradient {
+            to { background-position: 200%; }
+        }
+        .auth-box p { color: lightgray; margin-bottom: 30px; }
+        .toggle-text { margin: 20px 0; cursor: pointer; color: #72a1de; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #72a1de81;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-primary {
+            background: #2200493d;
+            border: 1px solid #72a1de81;
+            box-shadow: 0 0 10px #72a1de81;
+            color: white;
+        }
+        .btn-primary:hover { box-shadow: 0 0 20px #72a1de81; }
+        .btn-google {
+            background: white;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-guest {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid gray;
+            color: white;
+        }
+        .error { color: #ff6b6b; margin: 10px 0; font-size: 14px; }
+        .success { color: #51f551; margin: 10px 0; }
+        .loader-small {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff50;
+            border-top: 3px solid #72a1de;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Forgot Password Link */
+        .forgot-password {
+            text-align: right;
+            margin: 10px 0 20px 0;
+        }
+        .forgot-password a {
+            color: #72a1de;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Verification Notice */
+        .verification-notice {
+            background: rgba(114, 161, 222, 0.1);
+            border: 1px solid #72a1de;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .verification-notice i {
+            color: #72a1de;
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <video class="back-vid" autoplay loop muted plays-inline src="videos/BG.mp4"></video>
+
+    <div class="auth-container">
+        <!-- সুন্দর লোডার (প্রথমে দেখাবে) -->
+        <div id="initial-loader">
+            <div class="loader-container">
+                <div class="loader"></div>
+                <div class="loader-text">Loading Imperial United...</div>
+            </div>
+        </div>
+
+        <!-- লগইন বক্স (প্রথমে লুকানো) -->
+        <div class="auth-box" id="auth-box" style="display: none;">
+            <h1>Imperial <span>United</span></h1>
+            <p id="auth-title">Welcome back! Please login</p>
+
+            <!-- Verification Notice (Signup এর পর দেখাবে) -->
+            <div class="verification-notice" id="verification-notice" style="display: none;">
+                <i class='bx bxs-envelope'></i>
+                <p><strong>Verification Email Sent!</strong><br>
+                Please check your inbox and verify your email to complete registration.</p>
+            </div>
+
+            <div id="auth-form">
+                <div id="login-form">
+                    <input type="email" id="login-email" placeholder="Email" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <div class="forgot-password">
+                        <a href="#" id="forgot-password-link">Forgot Password?</a>
+                    </div>
+                    <button class="btn-primary" id="login-btn">Login <span class="loader-small" id="login-loader"></span></button>
+                </div>
+
+                <div id="signup-form" style="display: none;">
+                    <input type="text" id="signup-name" placeholder="Full Name" required>
+                    <input type="email" id="signup-email" placeholder="Email" required>
+                    <input type="password" id="signup-password" placeholder="Password (6+ chars)" required>
+                    <button class="btn-primary" id="signup-btn">Create Account <span class="loader-small" id="signup-loader"></span></button>
+                </div>
+            </div>
+
+            <p class="toggle-text" id="toggle-auth">Don't have an account? <span style="text-decoration:underline;">Sign up</span></p>
+
+            <button class="btn-google" id="google-btn">
+                <i class='bx bxl-google'></i> Continue with Google
+            </button>
+
+            <button class="btn-guest" id="guest-btn">Continue as Guest</button>
+
+            <p class="error" id="error-msg"></p>
+            <p class="success" id="success-msg"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            sendEmailVerification, 
+            onAuthStateChanged, 
+            signInAnonymously, 
+            sendPasswordResetEmail,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOGIh87THjpCJ4yDSaARq5UeS0IV2n8Mg",
+            authDomain: "gaming-page-singup-login.firebaseapp.com",
+            projectId: "gaming-page-singup-login",
+            storageBucket: "gaming-page-singup-login.firebasestorage.app",
+            messagingSenderId: "987407583206",
+            appId: "1:987407583206:web:85776b3a8bee3b408f3827",
+            measurementId: "G-BNS76XP16T"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // DOM Elements
+        const initialLoader = document.getElementById('initial-loader');
+        const authBox = document.getElementById('auth-box');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const toggleAuth = document.getElementById('toggle-auth');
+        const authTitle = document.getElementById('auth-title');
+        const errorMsg = document.getElementById('error-msg');
+        const successMsg = document.getElementById('success-msg');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const verificationNotice = document.getElementById('verification-notice');
+
+        // Redirect Control Variables
+        let isSigningUp = false;
+        let redirecting = false;
+
+        // Toggle Login/Signup
+        toggleAuth.addEventListener('click', () => {
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                verificationNotice.style.display = 'none';
+                authTitle.textContent = 'Welcome back! Please login';
+                toggleAuth.innerHTML = 'Don\'t have an account? <span style="text-decoration:underline;">Sign up</span>';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                verificationNotice.style.display = 'none';
+                authTitle.textContent = 'Join Imperial United';
+                toggleAuth.innerHTML = 'Already have an account? <span style="text-decoration:underline;">Login</span>';
+            }
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+        });
+
+        // Forgot Password Link
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            if (!email) {
+                errorMsg.textContent = 'Please enter your email first';
+                return;
+            }
+            
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    successMsg.textContent = 'Password reset link sent to your email!';
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/user-not-found') {
+                        errorMsg.textContent = 'No account found with this email.';
+                    } else {
+                        errorMsg.textContent = 'Error: ' + error.message;
+                    }
+                });
+        });
+
+        // FIXED: Auth state listener with redirect control
+        onAuthStateChanged(auth, (user) => {
+            console.log("Auth state changed. User:", user ? user.email : "No user");
+            
+            if (user && !isSigningUp && !redirecting) {
+                // Only redirect for login, not for signup
+                console.log("Redirecting to index.html...");
+                redirecting = true;
+                
+                // Small delay to show success message
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } else if (!user) {
+                initialLoader.style.display = 'none';
+                authBox.style.display = 'block';
+                redirecting = false;
+            }
+        });
+
+        // Signup function - FIXED: No auto-redirect after signup
+        document.getElementById('signup-btn').addEventListener('click', async () => {
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const loader = document.getElementById('signup-loader');
+            
+            if (!name || !email || password.length < 6) {
+                errorMsg.textContent = 'Please fill all fields correctly (Password 6+ chars)';
+                return;
+            }
+            
+            loader.style.display = 'inline-block';
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+            isSigningUp = true; // Set flag to prevent auto-redirect
+            
+            try {
+                // Create user with email and password
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Update display name
+                await updateProfile(user, {
+                    displayName: name
+                });
+                
+                // Send verification email
+                await sendEmailVerification(user);
+                
+                loader.style.display = 'none';
+                
+                // Show verification notice and switch to login form
+                verificationNotice.style.display = 'block';
+                successMsg.textContent = 'Account created successfully! Please verify your email.';
+                
+                // Switch to login form after successful signup
+                setTimeout(() => {
+                    loginForm.style.display = 'block';
+                    signupForm.style.display = 'none';
+                    verificationNotice.style.display = 'none';
+                    authTitle.textContent = 'Welcome back! Please login';
+                    toggleAuth.innerHTML = 'Don\'t have an account? <span style="text-decoration:underline;">Sign up</span>';
+                    document.getElementById('login-email').value = email;
+                    document.getElementById('signup-name').value = '';
+                    document.getElementById('signup-email').value = '';
+                    document.getElementById('signup-password').value = '';
+                    
+                    // Reset signup flag after switching forms
+                    setTimeout(() => {
+                        isSigningUp = false;
+                    }, 1000);
+                    
+                }, 2000);
+                
+                // Sign out the user after signup (so they need to login manually)
+                setTimeout(() => {
+                    auth.signOut().then(() => {
+                        console.log("Signed out after account creation");
+                        isSigningUp = false;
+                    });
+                }, 3000);
+                
+            } catch (error) {
+                loader.style.display = 'none';
+                isSigningUp = false;
+                
+                // Handle specific errors
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg.textContent = 'This email is already registered. Please use a different email or login.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg.textContent = 'Invalid email address. Please enter a valid email.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg.textContent = 'Password is too weak. Please use at least 6 characters.';
+                } else {
+                    errorMsg.textContent = 'Error: ' + error.message;
+                }
+            }
+        });
+
+        // Login function - Manual redirect
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const loader = document.getElementById('login-loader');
+            
+            if (!email || !password) {
+                errorMsg.textContent = 'Please enter email and password';
+                return;
+            }
+            
+            loader.style.display = 'inline-block';
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+            
+            try {
+                // Direct login attempt
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                successMsg.textContent = 'Login successful! Redirecting...';
+                
+                // Manual redirect after successful login
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (error) {
+                loader.style.display = 'none';
+                
+                // Handle specific errors
+                if (error.code === 'auth/wrong-password') {
+                    errorMsg.textContent = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMsg.textContent = 'No account found with this email. Please sign up first.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMsg.textContent = 'Invalid email or password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg.textContent = 'Invalid email address. Please enter a valid email.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMsg.textContent = 'Too many failed attempts. Please try again later or reset password.';
+                } else {
+                    errorMsg.textContent = 'Login error: ' + error.message;
+                }
+            }
+        });
+
+        // Google Login - Manual redirect
+        document.getElementById('google-btn').addEventListener('click', () => {
+            const loader = document.getElementById('login-loader');
+            loader.style.display = 'inline-block';
+            errorMsg.textContent = '';
+            
+            signInWithPopup(auth, provider)
+                .then(() => {
+                    successMsg.textContent = 'Login successful! Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                })
+                .catch((error) => {
+                    loader.style.display = 'none';
+                    if (error.code === 'auth/popup-blocked') {
+                        errorMsg.textContent = 'Popup blocked by browser. Please allow popups for this site.';
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        errorMsg.textContent = 'Sign-in popup was closed. Please try again.';
+                    } else {
+                        errorMsg.textContent = 'Google sign-in failed: ' + error.message;
+                    }
+                });
+        });
+
+        // Guest Login - Manual redirect
+        document.getElementById('guest-btn').addEventListener('click', () => {
+            const loader = document.getElementById('login-loader');
+            loader.style.display = 'inline-block';
+            errorMsg.textContent = '';
+            
+            signInAnonymously(auth)
+                .then(() => {
+                    successMsg.textContent = 'Login successful! Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                })
+                .catch((error) => {
+                    loader.style.display = 'none';
+                    errorMsg.textContent = 'Guest login failed: ' + error.message;
+                });
+        });
+
+        // Enter key support for login
+        document.getElementById('login-password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('login-btn').click();
+            }
+        });
+
+        // Enter key support for signup
+        document.getElementById('signup-password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('signup-btn').click();
+            }
+        });
+
+        // Auto focus on first input
+        setTimeout(() => {
+            if (loginForm.style.display !== 'none') {
+                document.getElementById('login-email').focus();
+            } else {
+                document.getElementById('signup-name').focus();
+            }
+        }, 500);
+
+    </script>
+</body>
+</html>

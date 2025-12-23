@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <link rel="icon" href="web_logo.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Players - Imperial United</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: url(videos/bg2.mp4);
+            background: transparent;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: #f0f0f0; 
+            min-height: 100vh;
+            overflow-x: hidden;
+            /* background: url(videos/bg2.mp4); */
+            /* background: url(videos/bg2.mp4); */
+        }
+        
+        .back-vid { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            z-index: -1; 
+            mix-blend-mode: overlay;
+            filter: brightness(0.7);
+        }
+        
+        header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 15px 20px; 
+            background: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(10px); 
+            z-index: 1000; 
+            border-bottom: 1px solid rgba(114, 161, 222, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        
+        .logo { 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h2 { 
+            margin: 0; 
+            font-size: 24px; 
+            background: linear-gradient(45deg, #72a1de, #a0e7e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logout-btn { 
+            background: rgba(255, 50, 50, 0.2); 
+            color: white; 
+            border: 1px solid rgba(255, 50, 50, 0.5); 
+            padding: 8px 20px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-btn:hover { 
+            background: rgba(255, 50, 50, 0.4); 
+            transform: translateY(-2px);
+        }
+        
+        .rating-section { 
+            padding-top: 100px; 
+            padding-bottom: 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+            text-align: center; 
+            max-width: 1400px; 
+            margin: 0 auto;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .page-title {
+            font-size: 42px;
+            background: linear-gradient(to right, #72a1de, #a0e7e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(114, 161, 222, 0.3);
+        }
+        
+        .page-subtitle {
+            font-size: 18px;
+            color: #a0e7e5;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        .rating-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 30px; 
+            margin-top: 30px;
+        }
+        
+        .player-card { 
+            background: rgba(10, 5, 30, 0.85); 
+            border-radius: 20px; 
+            padding: 25px; 
+            border: 1px solid rgba(114, 161, 222, 0.2); 
+            box-shadow: 0 8px 25px rgba(0, 10, 40, 0.5); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .player-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 15px 35px rgba(114, 161, 222, 0.3); 
+            border-color: rgba(114, 161, 222, 0.5);
+        }
+        
+        .player-media-box { 
+            width: 100%; 
+            height: 220px; 
+            overflow: hidden; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            background: linear-gradient(135deg, #001f7c, #0033aa);
+            position: relative;
+        }
+        
+        .player-media-box video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: transform 0.5s;
+        }
+        
+        .player-card:hover .player-media-box video {
+            transform: scale(1.05);
+        }
+        
+        .player-name { 
+            color: #72a1de; 
+            font-size: 22px; 
+            margin: 15px 0; 
+            font-weight: 600;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stars { 
+            font-size: 36px; 
+            cursor: pointer; 
+            margin: 20px 0; 
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .stars i { 
+            color: #333; 
+            transition: all 0.3s; 
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        .stars i.filled { 
+            color: #ffd700 !important; 
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+            transform: scale(1.1);
+        }
+        
+        .rating-info { 
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(114, 161, 222, 0.2);
+        }
+        
+        .average-rating { 
+            font-size: 18px; 
+            margin: 10px 0; 
+            color: #ccc;
+        }
+        
+        .average-rating span { 
+            font-size: 28px; 
+            color: #ffd700; 
+            font-weight: bold;
+        }
+        
+        .total-ratings { 
+            color: #a0e7e5; 
+            font-size: 15px; 
+            margin: 8px 0;
+        }
+        
+        .user-rating { 
+            color: #ffaa33; 
+            font-size: 16px; 
+            margin: 10px 0 0 0;
+            font-weight: 500;
+        }
+        
+        .loading { 
+            text-align: center; 
+            color: #72a1de; 
+            font-size: 22px; 
+            margin: 50px auto;
+            grid-column: 1 / -1;
+        }
+        
+        .firebase-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-connected { color: #4CAF50; }
+        .status-disconnected { color: #FF5722; }
+        
+        @media (max-width: 768px) {
+            .rating-section {
+                padding-top: 90px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .page-title {
+                font-size: 32px;
+                margin-top: 10px;
+            }
+            
+            .page-subtitle {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+            
+            .rating-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .player-card {
+                padding: 20px;
+            }
+            
+            header {
+                height: 60px;
+                padding: 10px 15px;
+            }
+            
+            .logo h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <img class="back-vid" autoplay loop muted playsinline>
+        <img class="back-vid" autoplay loop muted plays-inline src="BG_pic.png"></img>
+</img>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <h2>Imperial United</h2>
+        </div>
+        <button class="logout-btn" id="logoutBtn">
+            <i class='bx bx-log-out'></i> Logout
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <section class="rating-section">
+        <h1 class="page-title">Rate Our Players</h1>
+        
+        <div class="rating-container">
+            <div class="loading">Loading players...</div>
+        </div>
+    </section>
+
+    <!-- Firebase Status -->
+    <div class="firebase-status" id="firebaseStatus">
+        <i class='bx bx-wifi' id="statusIcon"></i>
+        <span id="statusText">Connecting to Firebase...</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, get, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOGIh87THjpCJ4yDSaARq5UeS0IV2n8Mg",
+            authDomain: "gaming-page-singup-login.firebaseapp.com",
+            projectId: "gaming-page-singup-login",
+            storageBucket: "gaming-page-singup-login.firebasestorage.app",
+            messagingSenderId: "987407583206",
+            appId: "1:987407583206:web:85776b3a8bee3b408f3827",
+            databaseURL: "https://gaming-page-singup-login-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Update status display
+        function updateFirebaseStatus(connected, message) {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            
+            if (connected) {
+                statusIcon.className = 'bx bx-wifi status-connected';
+                statusText.textContent = message || 'Connected to Firebase';
+                statusText.className = 'status-connected';
+            } else {
+                statusIcon.className = 'bx bx-wifi-off status-disconnected';
+                statusText.textContent = message || 'Disconnected from Firebase';
+                statusText.className = 'status-disconnected';
+            }
+        }
+
+        // Players data
+        const players = [
+            { id: "alif", name: "Alif Mahamud Arafat", media: "alif.mp4" },
+            { id: "minhaz", name: "Minhaz Mia Siam", media: "siam.mp4" },
+            { id: "sahali", name: "MD Sah-Ali Islam", media: "Sah ali.mp4" },
+            { id: "muaz", name: "Muaz Ahamed", media: "muaz.mp4" },
+            { id: "shibab", name: "MD Shibab Islam", media: "sihab.mp4" },
+            { id: "rawfun", name: "Rawfun Ahamed", media: "Raw.mp4" },
+            
+            
+        ];
+
+        // DOM elements
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Logout function
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (error) {
+                console.error("Logout error:", error);
+                alert("Logout failed. Please try again.");
+            }
+        });
+
+        // Test Firebase connection
+        const connectedRef = ref(db, '.info/connected');
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                updateFirebaseStatus(true, 'Firebase Connected ✓');
+            } else {
+                updateFirebaseStatus(false, 'Firebase Disconnected ✗');
+            }
+        });
+
+        // Main function to initialize the app
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const uid = user.uid;
+            const container = document.querySelector(".rating-container");
+            
+            // Clear loading message
+            container.innerHTML = "";
+
+            // Create player cards
+            players.forEach((player, index) => {
+                // Create card
+                const card = document.createElement("div");
+                card.className = "player-card";
+                card.dataset.playerId = player.id;
+                
+                card.innerHTML = `
+                    <div class="player-media-box">
+                        <video autoplay loop muted playsinline>
+                            <source src="${player.media}" type="video/mp4">
+                        </video>
+                    </div>
+                    
+                    <h3 class="player-name">${player.name}</h3>
+                    
+                    <div class="stars" data-player="${player.id}">
+                        <i class='bx bxs-star' data-value="1"></i>
+                        <i class='bx bxs-star' data-value="2"></i>
+                        <i class='bx bxs-star' data-value="3"></i>
+                        <i class='bx bxs-star' data-value="4"></i>
+                        <i class='bx bxs-star' data-value="5"></i>
+                    </div>
+                    
+                    <div class="rating-info">
+                        <p class="average-rating">
+                            Average: <span class="avg">0.0</span> ⭐
+                        </p>
+                        <p class="total-ratings">
+                            Based on <span class="count">0</span> ratings
+                        </p>
+                        <p class="user-rating">
+                            Your rating: <span class="user">Not rated yet</span>
+                        </p>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+
+                // Get references to elements
+                const stars = card.querySelectorAll(".stars i");
+                const avgSpan = card.querySelector(".avg");
+                const countSpan = card.querySelector(".count");
+                const userRatingSpan = card.querySelector(".user");
+
+                // Firebase references - SIMPLE STRUCTURE
+                // Structure: ratings/{playerId}/{userId} = ratingValue
+                const ratingsRef = ref(db, `ratings/${player.id}`);
+                const userRatingRef = ref(db, `ratings/${player.id}/${uid}`);
+
+                // Function to calculate and display ratings
+                const updateRatings = (ratingsData) => {
+                    let total = 0;
+                    let count = 0;
+                    let userRating = 0;
+                    
+                    if (ratingsData) {
+                        const ratings = Object.entries(ratingsData);
+                        count = ratings.length;
+                        
+                        ratings.forEach(([userId, ratingValue]) => {
+                            if (typeof ratingValue === 'number') {
+                                total += ratingValue;
+                                if (userId === uid) {
+                                    userRating = ratingValue;
+                                }
+                            }
+                        });
+                    }
+
+                    // Update average
+                    if (count > 0) {
+                        const average = (total / count).toFixed(1);
+                        avgSpan.textContent = average;
+                        countSpan.textContent = count;
+                    } else {
+                        avgSpan.textContent = "0.0";
+                        countSpan.textContent = "0";
+                    }
+
+                    // Update user rating
+                    if (userRating > 0) {
+                        userRatingSpan.textContent = `${userRating} ⭐`;
+                        stars.forEach(star => {
+                            const starValue = parseInt(star.dataset.value);
+                            if (starValue <= userRating) {
+                                star.classList.add("filled");
+                                star.style.color = "#ffd700";
+                            } else {
+                                star.classList.remove("filled");
+                                star.style.color = "#333";
+                            }
+                        });
+                    } else {
+                        userRatingSpan.textContent = "Not rated yet";
+                        stars.forEach(star => {
+                            star.classList.remove("filled");
+                            star.style.color = "#333";
+                        });
+                    }
+                };
+
+                // Load and listen to ratings
+                onValue(ratingsRef, (snapshot) => {
+                    const ratingsData = snapshot.val();
+                    updateRatings(ratingsData);
+                }, (error) => {
+                    console.error(`Error loading ratings for ${player.name}:`, error);
+                    updateFirebaseStatus(false, `Error: ${error.message}`);
+                });
+
+                // Star click handler - SIMPLE SAVE
+                stars.forEach(star => {
+                    star.addEventListener('click', async () => {
+                        const ratingValue = parseInt(star.dataset.value);
+                        
+                        try {
+                            // Save only the rating value (number)
+                            await set(userRatingRef, ratingValue);
+                            
+                            // Immediate visual feedback
+                            stars.forEach(s => {
+                                const sValue = parseInt(s.dataset.value);
+                                if (sValue <= ratingValue) {
+                                    s.classList.add("filled");
+                                    s.style.color = "#ffd700";
+                                } else {
+                                    s.classList.remove("filled");
+                                    s.style.color = "#333";
+                                }
+                            });
+                            
+                            userRatingSpan.textContent = `${ratingValue} ⭐`;
+                            updateFirebaseStatus(true, 'Rating saved successfully ✓');
+                            
+                            // Success animation
+                            card.style.boxShadow = "0 0 30px rgba(0, 255, 0, 0.5)";
+                            setTimeout(() => card.style.boxShadow = "", 500);
+                            
+                        } catch (error) {
+                            console.error("Error saving rating:", error);
+                            updateFirebaseStatus(false, 'Error saving rating ✗');
+                            
+                            // Error animation
+                            card.style.boxShadow = "0 0 30px rgba(255, 0, 0, 0.5)";
+                            setTimeout(() => card.style.boxShadow = "", 1000);
+                            
+                            alert("Failed to save rating. Check Firebase Rules.");
+                        }
+                    });
+                });
+
+                // Hover effects
+                stars.forEach(star => {
+                    star.addEventListener('mouseenter', () => {
+                        const hoverValue = parseInt(star.dataset.value);
+                        stars.forEach(s => {
+                            const sValue = parseInt(s.dataset.value);
+                            s.style.color = sValue <= hoverValue ? '#ffd700' : '#333';
+                        });
+                    });
+
+                    star.addEventListener('mouseleave', () => {
+                        // Get current rating to restore colors
+                        get(userRatingRef).then((snapshot) => {
+                            const userRating = snapshot.val() || 0;
+                            stars.forEach(s => {
+                                const sValue = parseInt(s.dataset.value);
+                                s.style.color = sValue <= userRating ? '#ffd700' : '#333';
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        // Initialize app
+        console.log("Imperial United Rating System Initialized");
+        updateFirebaseStatus(true, "Server connecting...");
+
+    </script>
+</body>
+</html>
